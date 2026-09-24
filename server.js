@@ -62,7 +62,21 @@ function prepareNextApp() {
     
     // --- START CRON SCHEDULER ---
     console.log("🕒 Initializing Auto-Scheduler for Daily Posts...");
-    cron.schedule('0 7 * * *', async () => {
+    
+    // Extract CRON time from constants.ts (so it doesn't break CommonJS server)
+    let cronTime = '0 7 * * *';
+    try {
+      const constantsContent = fs.readFileSync(path.join(__dirname, 'src/lib/constants.ts'), 'utf-8');
+      const match = constantsContent.match(/DAILY_POST_TIME\s*=\s*["']([^"']+)["']/);
+      if (match && match[1]) {
+        cronTime = match[1];
+      }
+    } catch (e) {
+      console.warn("Could not read constants.ts for CRON time, defaulting to 7 AM.");
+    }
+    
+    console.log(`⏰ Cron Scheduled for: ${cronTime}`);
+    cron.schedule(cronTime, async () => {
         console.log(`[${new Date().toISOString()}] Triggering daily post generation...`);
         try {
             // Since this runs within the same server, we can hit localhost:PORT
