@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
-import { SPREADSHEET_URL, GEMINI_API_KEY, COMPANY_NAME } from "@/lib/constants";
+import { SPREADSHEET_URL, GEMINI_API_KEY, COMPANY_NAME, GEMINI_IMAGE_MODEL } from "@/lib/constants";
 import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
@@ -55,7 +55,7 @@ export async function GET(req: Request) {
 
         console.log(`Found Topic: ${topic}`);
 
-        // 3. Generate Image using Gemini (Imagen 3 API via REST)
+        // 3. Generate Image using Gemini (Imagen API via REST)
         // We will construct a highly detailed prompt based on Brainket Brand Rules
         const imagePrompt = `
         A professional, modern, and high-quality social media graphic for '${COMPANY_NAME}'.
@@ -68,7 +68,7 @@ export async function GET(req: Request) {
 
         console.log("Calling Gemini Imagen API...");
         const geminiImageResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_IMAGE_MODEL}:predict?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

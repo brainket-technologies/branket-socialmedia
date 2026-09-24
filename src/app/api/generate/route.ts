@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { google } from "googleapis";
-import { COMPANY_NAME, SERVICES, GEMINI_API_KEY, SPREADSHEET_URL } from "@/lib/constants";
+import { COMPANY_NAME, SERVICES, GEMINI_API_KEY, SPREADSHEET_URL, GEMINI_MODEL } from "@/lib/constants";
 import path from "path";
 
 const SPREADSHEET_ID = SPREADSHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || SPREADSHEET_URL;
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         const daysInMonth = new Date(year, date.getMonth() + 1, 0).getDate();
         
         // 2. Call Gemini API
-        const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" }); 
+        const model = genAI.getGenerativeModel({ model: GEMINI_MODEL }); 
         const prompt = `
         You are an expert Social Media Manager and SEO Specialist for '${COMPANY_NAME}'.
         Create a ${daysInMonth}-day daily content calendar for the month of ${monthName}.
