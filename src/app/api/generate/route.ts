@@ -28,11 +28,16 @@ export async function POST(req: Request) {
         // 2. Call Gemini API
         const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" }); 
         const prompt = `
-        You are a professional Social Media Manager for '${COMPANY_NAME}'.
+        You are an expert Social Media Manager and SEO Specialist for '${COMPANY_NAME}'.
         Create a ${daysInMonth}-day daily content calendar for the month of ${monthName}.
         
         The company offers the following services:
         ${SERVICES.join(', ')}
+        
+        CRITICAL CONTENT RULES (MUST FOLLOW):
+        1. SEO & AI Search Optimized: Use high-volume keywords naturally so the content ranks well on AI search engines (like Perplexity, ChatGPT Search) and Google.
+        2. 100% Human Wording: The content MUST sound like a real human expert wrote it. It should be conversational, engaging, and direct.
+        3. NO AI BUZZWORDS: Do NOT use cliché AI phrases like "In today's fast-paced digital world", "Unlock your potential", "Elevate", "Delve", "Testament", "Revolutionize", "Landscape", or "Supercharge".
         
         IMPORTANT: Vary the post formats! Mix it up using:
         - Single Image Post
@@ -44,7 +49,7 @@ export async function POST(req: Request) {
         Output the data strictly as a CSV format using a pipe '|' character as the delimiter. Do not include any markdown formatting, code blocks, or extra text.
         Do NOT output a header row. Start directly with the first date's row.
         
-        IMPORTANT: Combine the Caption Hook, Description, Visual Concept, and at least 15-20 relevant Hashtags into a single cohesive 'Post Content' string. Do NOT use newlines/line breaks inside the cell data, format it simply as one continuous text block or separate parts with spaces/dashes.
+        IMPORTANT: Combine the Caption Hook, Description, Visual Concept, and at least 15-20 relevant SEO Hashtags into a single cohesive 'Post Content' string. Do NOT use newlines/line breaks inside the cell data, format it simply as one continuous text block or separate parts with spaces/dashes.
         
         Each row MUST have exactly 4 columns:
         Date|Format|Service/Topic|Post Content
