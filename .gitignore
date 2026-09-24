@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+src/lib/credentials.json
+
+# Dummy Agent Files
+AGENTS.md
+CLAUDE.md
