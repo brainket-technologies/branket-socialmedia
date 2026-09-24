@@ -63,22 +63,35 @@ function prepareNextApp() {
     // --- START CRON SCHEDULER ---
     console.log("🕒 Initializing Auto-Schedulers...");
     
-    // Extract CRON times from constants.ts (so it doesn't break CommonJS server)
-    let dailyCronTime = '0 7 * * *';
-    let monthlyCronTime = '0 1 1 * *';
+    // Extract simple times from constants.ts (e.g. "07:00 AM")
+    let rawDailyTime = '07:00 AM';
+    let rawMonthlyTime = '01:00 AM';
+    
     try {
       const constantsContent = fs.readFileSync(path.join(__dirname, 'src/lib/constants.ts'), 'utf-8');
       const dailyMatch = constantsContent.match(/DAILY_POST_TIME\s*=\s*["']([^"']+)["']/);
-      if (dailyMatch && dailyMatch[1]) {
-        dailyCronTime = dailyMatch[1];
-      }
+      if (dailyMatch && dailyMatch[1]) rawDailyTime = dailyMatch[1];
+      
       const monthlyMatch = constantsContent.match(/MONTHLY_CALENDAR_TIME\s*=\s*["']([^"']+)["']/);
-      if (monthlyMatch && monthlyMatch[1]) {
-        monthlyCronTime = monthlyMatch[1];
-      }
+      if (monthlyMatch && monthlyMatch[1]) rawMonthlyTime = monthlyMatch[1];
     } catch (e) {
-      console.warn("Could not read constants.ts for CRON times, using defaults.");
+      console.warn("Could not read constants.ts for times, using defaults.");
     }
+
+    // Helper to convert "07:30 AM" to cron "30 7 * * *"
+    function timeToCron(timeStr, dayOfMonth = '*') {
+        const match = timeStr.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!match) return `0 7 ${dayOfMonth} * *`;
+        let [_, hour, minute, ampm] = match;
+        hour = parseInt(hour, 10);
+        if (ampm.toUpperCase() === 'PM' && hour < 12) hour += 12;
+        if (ampm.toUpperCase() === 'AM' && hour === 12) hour = 0;
+        return `${parseInt(minute, 10)} ${hour} ${dayOfMonth} * *`;
+    }
+
+    let dailyCronTime = timeToCron(rawDailyTime, '*');
+    let monthlyCronTime = timeToCron(rawMonthlyTime, '1'); // 1st of the month
+
     
     // 1. Daily Post Auto-Scheduler
     console.log(`⏰ Daily Post Cron Scheduled for: ${dailyCronTime}`);
