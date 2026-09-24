@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { google } from "googleapis";
-import { COMPANY_NAME, SERVICES, GEMINI_API_KEY, SPREADSHEET_ID } from "@/lib/constants";
+import { COMPANY_NAME, SERVICES, GEMINI_API_KEY, SPREADSHEET_URL } from "@/lib/constants";
 import path from "path";
+
+const SPREADSHEET_ID = SPREADSHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || SPREADSHEET_URL;
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);

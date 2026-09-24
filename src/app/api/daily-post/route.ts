@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
-import { SPREADSHEET_ID, GEMINI_API_KEY, COMPANY_NAME } from "@/lib/constants";
+import { SPREADSHEET_URL, GEMINI_API_KEY, COMPANY_NAME } from "@/lib/constants";
 import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
+
+const SPREADSHEET_ID = SPREADSHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || SPREADSHEET_URL;
 
 export async function GET(req: Request) {
     try {

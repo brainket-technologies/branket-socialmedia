@@ -26,7 +26,6 @@ export const SERVICES = [
 export const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
 export const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1_2rTY0mj3ix293Bt2gz5VMuDYL68Je8lBSFLjpWFncY/edit?usp=sharing";
-export const SPREADSHEET_ID = SPREADSHEET_URL.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] || SPREADSHEET_URL;
 
 // Aap in times ko apne hisaab se easily change kar sakte hain (Format: HH:MM AM/PM)
 export const DAILY_POST_TIME = "07:00 AM"; // Daily post ka time
