@@ -63,19 +63,15 @@ function prepareNextApp() {
     // --- START CRON SCHEDULER ---
     console.log("🕒 Initializing Auto-Schedulers...");
     
-    // Extract simple times from constants.ts (e.g. "07:00 AM")
+    // Extract simple times from constants.ts (e.g. "07:00 AM" and "1, 01:00 AM")
     let rawDailyTime = '07:00 AM';
-    let rawMonthlyDate = '1';
-    let rawMonthlyTime = '01:00 AM';
+    let rawMonthlyTime = '1, 01:00 AM';
     
     try {
       const constantsContent = fs.readFileSync(path.join(__dirname, 'src/lib/constants.ts'), 'utf-8');
       
       const dailyMatch = constantsContent.match(/DAILY_POST_TIME\s*=\s*["']([^"']+)["']/);
       if (dailyMatch && dailyMatch[1]) rawDailyTime = dailyMatch[1];
-      
-      const monthlyDateMatch = constantsContent.match(/MONTHLY_CALENDAR_DATE\s*=\s*["']([^"']+)["']/);
-      if (monthlyDateMatch && monthlyDateMatch[1]) rawMonthlyDate = monthlyDateMatch[1];
 
       const monthlyTimeMatch = constantsContent.match(/MONTHLY_CALENDAR_TIME\s*=\s*["']([^"']+)["']/);
       if (monthlyTimeMatch && monthlyTimeMatch[1]) rawMonthlyTime = monthlyTimeMatch[1];
@@ -83,19 +79,30 @@ function prepareNextApp() {
       console.warn("Could not read constants.ts for times, using defaults.");
     }
 
-    // Helper to convert "07:30 AM" to cron "30 7 * * *"
-    function timeToCron(timeStr, dayOfMonth = '*') {
+    // Helper for Daily Time (e.g. "07:30 AM")
+    function timeToCron(timeStr) {
         const match = timeStr.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
-        if (!match) return `0 7 ${dayOfMonth} * *`;
+        if (!match) return `0 7 * * *`;
         let [_, hour, minute, ampm] = match;
         hour = parseInt(hour, 10);
         if (ampm.toUpperCase() === 'PM' && hour < 12) hour += 12;
         if (ampm.toUpperCase() === 'AM' && hour === 12) hour = 0;
-        return `${parseInt(minute, 10)} ${hour} ${dayOfMonth} * *`;
+        return `${parseInt(minute, 10)} ${hour} * * *`;
+    }
+    
+    // Helper for Monthly Time (e.g. "1, 01:00 AM")
+    function monthlyToCron(timeStr) {
+        const match = timeStr.trim().match(/^(\d+)[,\s]+(\d+):(\d+)\s*(AM|PM)/i);
+        if (!match) return `0 1 1 * *`;
+        let [_, day, hour, minute, ampm] = match;
+        hour = parseInt(hour, 10);
+        if (ampm.toUpperCase() === 'PM' && hour < 12) hour += 12;
+        if (ampm.toUpperCase() === 'AM' && hour === 12) hour = 0;
+        return `${parseInt(minute, 10)} ${hour} ${day} * *`;
     }
 
-    let dailyCronTime = timeToCron(rawDailyTime, '*');
-    let monthlyCronTime = timeToCron(rawMonthlyTime, rawMonthlyDate); // Configurable date
+    let dailyCronTime = timeToCron(rawDailyTime);
+    let monthlyCronTime = monthlyToCron(rawMonthlyTime);
 
     
     // 1. Daily Post Auto-Scheduler

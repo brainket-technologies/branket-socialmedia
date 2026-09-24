@@ -30,6 +30,5 @@ export const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1_2rTY0mj
 // Aap in times ko apne hisaab se easily change kar sakte hain (Format: HH:MM AM/PM)
 export const DAILY_POST_TIME = "07:00 AM"; // Daily post ka time
 
-// Har mahine calendar kab banega? (Date aur Time)
-export const MONTHLY_CALENDAR_DATE = "1"; // Mahine ki 1 tareekh
-export const MONTHLY_CALENDAR_TIME = "01:00 AM"; // Raat ke 1:00 AM baje
+// Har mahine calendar kab banega? (Format: Date, HH:MM AM/PM)
+export const MONTHLY_CALENDAR_TIME = "1, 01:00 AM"; // Mahine ki 1 tareekh ko 1:00 AM baje
