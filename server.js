@@ -61,33 +61,50 @@ function prepareNextApp() {
     console.log('Next.js app prepared and ready to handle requests.');
     
     // --- START CRON SCHEDULER ---
-    console.log("🕒 Initializing Auto-Scheduler for Daily Posts...");
+    console.log("🕒 Initializing Auto-Schedulers...");
     
-    // Extract CRON time from constants.ts (so it doesn't break CommonJS server)
-    let cronTime = '0 7 * * *';
+    // Extract CRON times from constants.ts (so it doesn't break CommonJS server)
+    let dailyCronTime = '0 7 * * *';
+    let monthlyCronTime = '0 1 1 * *';
     try {
       const constantsContent = fs.readFileSync(path.join(__dirname, 'src/lib/constants.ts'), 'utf-8');
-      const match = constantsContent.match(/DAILY_POST_TIME\s*=\s*["']([^"']+)["']/);
-      if (match && match[1]) {
-        cronTime = match[1];
+      const dailyMatch = constantsContent.match(/DAILY_POST_TIME\s*=\s*["']([^"']+)["']/);
+      if (dailyMatch && dailyMatch[1]) {
+        dailyCronTime = dailyMatch[1];
+      }
+      const monthlyMatch = constantsContent.match(/MONTHLY_CALENDAR_TIME\s*=\s*["']([^"']+)["']/);
+      if (monthlyMatch && monthlyMatch[1]) {
+        monthlyCronTime = monthlyMatch[1];
       }
     } catch (e) {
-      console.warn("Could not read constants.ts for CRON time, defaulting to 7 AM.");
+      console.warn("Could not read constants.ts for CRON times, using defaults.");
     }
     
-    console.log(`⏰ Cron Scheduled for: ${cronTime}`);
-    cron.schedule(cronTime, async () => {
+    // 1. Daily Post Auto-Scheduler
+    console.log(`⏰ Daily Post Cron Scheduled for: ${dailyCronTime}`);
+    cron.schedule(dailyCronTime, async () => {
         console.log(`[${new Date().toISOString()}] Triggering daily post generation...`);
         try {
-            // Since this runs within the same server, we can hit localhost:PORT
-            // Or better yet, we can hit localhost:3000 if not using passenger, but passenger uses a pipe
-            // For simplicity, we just hit the Next.js API route via http://127.0.0.1:3000 if numeric, else we just use the public URL or standard localhost
             const targetUrl = isNumeric ? `http://localhost:${parsedPort}/api/daily-post` : `http://127.0.0.1:3000/api/daily-post`;
             const res = await fetch(targetUrl);
             const data = await res.json();
             console.log("✅ Auto-Post Result:", data);
         } catch (e) {
             console.error("❌ Auto-Post Error:", e.message);
+        }
+    });
+
+    // 2. Monthly Calendar Auto-Scheduler
+    console.log(`📅 Monthly Calendar Cron Scheduled for: ${monthlyCronTime}`);
+    cron.schedule(monthlyCronTime, async () => {
+        console.log(`[${new Date().toISOString()}] Triggering monthly calendar generation...`);
+        try {
+            const targetUrl = isNumeric ? `http://localhost:${parsedPort}/api/generate` : `http://127.0.0.1:3000/api/generate`;
+            const res = await fetch(targetUrl);
+            const data = await res.json();
+            console.log("✅ Monthly Calendar Result:", data);
+        } catch (e) {
+            console.error("❌ Monthly Calendar Error:", e.message);
         }
     });
     // --- END CRON SCHEDULER ---
