@@ -65,15 +65,20 @@ function prepareNextApp() {
     
     // Extract simple times from constants.ts (e.g. "07:00 AM")
     let rawDailyTime = '07:00 AM';
+    let rawMonthlyDate = '1';
     let rawMonthlyTime = '01:00 AM';
     
     try {
       const constantsContent = fs.readFileSync(path.join(__dirname, 'src/lib/constants.ts'), 'utf-8');
+      
       const dailyMatch = constantsContent.match(/DAILY_POST_TIME\s*=\s*["']([^"']+)["']/);
       if (dailyMatch && dailyMatch[1]) rawDailyTime = dailyMatch[1];
       
-      const monthlyMatch = constantsContent.match(/MONTHLY_CALENDAR_TIME\s*=\s*["']([^"']+)["']/);
-      if (monthlyMatch && monthlyMatch[1]) rawMonthlyTime = monthlyMatch[1];
+      const monthlyDateMatch = constantsContent.match(/MONTHLY_CALENDAR_DATE\s*=\s*["']([^"']+)["']/);
+      if (monthlyDateMatch && monthlyDateMatch[1]) rawMonthlyDate = monthlyDateMatch[1];
+
+      const monthlyTimeMatch = constantsContent.match(/MONTHLY_CALENDAR_TIME\s*=\s*["']([^"']+)["']/);
+      if (monthlyTimeMatch && monthlyTimeMatch[1]) rawMonthlyTime = monthlyTimeMatch[1];
     } catch (e) {
       console.warn("Could not read constants.ts for times, using defaults.");
     }
@@ -90,7 +95,7 @@ function prepareNextApp() {
     }
 
     let dailyCronTime = timeToCron(rawDailyTime, '*');
-    let monthlyCronTime = timeToCron(rawMonthlyTime, '1'); // 1st of the month
+    let monthlyCronTime = timeToCron(rawMonthlyTime, rawMonthlyDate); // Configurable date
 
     
     // 1. Daily Post Auto-Scheduler

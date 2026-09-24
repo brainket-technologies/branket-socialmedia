@@ -29,4 +29,7 @@ export const SPREADSHEET_ID = "1_2rTY0mj3ix293Bt2gz5VMuDYL68Je8lBSFLjpWFncY";
 
 // Aap in times ko apne hisaab se easily change kar sakte hain (Format: HH:MM AM/PM)
 export const DAILY_POST_TIME = "07:00 AM"; // Daily post ka time
-export const MONTHLY_CALENDAR_TIME = "01:00 AM"; // Har mahine ki 1 tareekh ka time
+
+// Har mahine calendar kab banega? (Date aur Time)
+export const MONTHLY_CALENDAR_DATE = "1"; // Mahine ki 1 tareekh
+export const MONTHLY_CALENDAR_TIME = "01:00 AM"; // Raat ke 1:00 AM baje
